@@ -10,8 +10,8 @@ Adafruit_BME280 bme;
 float temperature, humidity, pressure, altitude;
 
 /*Put your SSID & Password*/
-const char* ssid = "YourNetworkName";  // Enter SSID here
-const char* password = "YourPassword";  //Enter Password here
+const char* ssid = "ODAM-Makerspace-2.4";  // Enter SSID here
+const char* password = "pHeHQzp2qM%";  //Enter Password here
 
 ESP8266WebServer server(80);              
  
