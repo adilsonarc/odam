@@ -2,12 +2,25 @@
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
+#include <string>
 
-#define SEALEVELPRESSURE_HPA (1013.25)
+#define SEALEVELPRESSURE_HPA (1013.25F)
+
+#include <Arduino.h>
+
+// put function declarations here:
+void setup();
+void loop();
+void handle_OnConnect();
+void handle_NotFound();
+String SendHTML(float temperature,float humidity,float pressure,float altitude);
+
+  float temperature;
+  float humidity;
+  float pressure;
+  float altitude;
 
 Adafruit_BME280 bme;
-
-float temperature, humidity, pressure, altitude;
 
 /*Put your SSID & Password*/
 const char* ssid = "YourNetworkName";  // Enter SSID here
