@@ -3,9 +3,7 @@
 
 // put function declarations here:
 void configureMonitor(int);
-void configureWifiAccessPoint(IPAddress, IPAddress, IPAddress, char *);
 void configureWifiAccessPoint(IPAddress, IPAddress, IPAddress, char *, char *);
-void configureWifiAccessPoint(IPAddress, IPAddress, IPAddress, char *, char *, int, int, int);
 
 void monitorAccessPoint();
 
