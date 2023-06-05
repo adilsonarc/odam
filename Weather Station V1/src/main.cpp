@@ -14,6 +14,7 @@ void startAccessPointMode();
 void startWebServer();
 void handleRoot(); // function prototypes for HTTP handlers
 void handleNotFound();
+void handleGetData();
 
 ESP8266WebServer server(80); // Create a webserver object that listens for HTTP request on port 80
 
@@ -52,6 +53,7 @@ void establishingWiFiConnection()
   wifiMulti.addAP("ssid_from_AP_1", "your_password_for_AP_1"); // add Wi-Fi networks you want to connect to
   wifiMulti.addAP("ssid_from_AP_2", "your_password_for_AP_2");
   wifiMulti.addAP("ssid_from_AP_3", "your_password_for_AP_3");
+  wifiMulti.addAP("Vodafone-6EE702", "g7Sk9VhVvs2WMNbB");
 
   Serial.println("Connecting ...");
   int i = 0;
@@ -104,8 +106,9 @@ void startAccessPointMode()
 
 void startWebServer()
 {
-  server.on("/", handleRoot);        // Call the 'handleRoot' function when a client requests URI "/"
-  server.onNotFound(handleNotFound); // When a client requests an unknown URI (i.e. something other than "/"), call function "handleNotFound"
+  server.on("/", handleRoot);                  // Call the 'handleRoot' function when a client requests URI "/"
+  server.onNotFound(handleNotFound);           // When a client requests an unknown URI (i.e. something other than "/"), call function "handleNotFound"
+  server.on("/data", HTTP_GET, handleGetData); // Call the 'handleGetData' function when a GET request is made to URI "/data"
 
   server.begin(); // Actually start the server
   Serial.println("HTTP server started");
@@ -119,4 +122,23 @@ void handleRoot()
 void handleNotFound()
 {
   server.send(404, "text/plain", "404: Not found"); // Send HTTP status 404 (Not Found) when there's no handler for the URI in the request
+}
+
+void handleGetData()
+{
+// Providing a seed value to generate random number
+	srand((unsigned) time(NULL));
+
+  String clientResponse = "{";
+  clientResponse += "\"temperature\":";
+  clientResponse += rand();
+  clientResponse += ",\"humidity\":";
+  clientResponse += rand();
+  clientResponse += ",\"pressure\":";
+  clientResponse += rand();
+  clientResponse += ",\"altitudex\":";
+  clientResponse += rand();
+  clientResponse += "}";
+
+  server.send(200, "application/json", clientResponse);
 }
