@@ -1,16 +1,19 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>      // Include the Wi-Fi library
 #include <ESP8266WiFiMulti.h> // Include the Wi-Fi-Multi library
+#include <ESP8266WiFi.h>      // Include the Wi-Fi library
 
 // put function declarations here:
 void startSerialCommunication();
 void establishingWiFiConnection();
+void startAccessPointMode();
 
 void setup()
 {
   // put your setup code here, to run once:
   startSerialCommunication();
   establishingWiFiConnection();
+  startAccessPointMode();
 }
 
 void loop()
@@ -50,4 +53,18 @@ void establishingWiFiConnection()
   Serial.println(WiFi.SSID()); // Tell us what network we're connected to
   Serial.print("IP address:\t");
   Serial.println(WiFi.localIP()); // Send the IP address of the ESP8266 to the computer
+}
+
+void startAccessPointMode()
+{
+  const char *ssid = "ESP8266 Access Point"; // The name of the Wi-Fi network that will be created
+  const char *password = "987654321";        // The password required to connect to it, leave blank for an open network
+
+  WiFi.softAP(ssid, password); // Start the access point
+  Serial.print("Access Point \"");
+  Serial.print(ssid);
+  Serial.println("\" started");
+
+  Serial.print("IP address:\t");
+  Serial.println(WiFi.softAPIP()); // Send the IP address of the ESP8266 to the computer
 }
