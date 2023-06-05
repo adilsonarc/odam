@@ -2,11 +2,13 @@
 #include <ESP8266WiFi.h> // Include the Wi-Fi library
 
 // put function declarations here:
+void startSerialCommunication();
 void establishingWiFiConnection();
 
 void setup()
 {
   // put your setup code here, to run once:
+  startSerialCommunication();
   establishingWiFiConnection();
 }
 
@@ -16,6 +18,13 @@ void loop()
 }
 
 // put function definitions here:
+
+void startSerialCommunication() {
+  Serial.begin(115200);         // Start the Serial communication to send messages to the computer
+  delay(10);
+  Serial.println('\n');
+}
+
 void establishingWiFiConnection()
 {
   const char *ssid = "SSID";         // The SSID (name) of the Wi-Fi network you want to connect to
