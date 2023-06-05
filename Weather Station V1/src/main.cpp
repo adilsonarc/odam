@@ -31,10 +31,6 @@ void establishingWiFiConnection()
   const char *ssid = "SSID";         // The SSID (name) of the Wi-Fi network you want to connect to
   const char *password = "PASSWORD"; // The password of the Wi-Fi network
 
-  Serial.begin(115200); // Start the Serial communication to send messages to the computer
-  delay(10);
-  Serial.println('\n');
-
   WiFi.begin(ssid, password); // Connect to the network
   Serial.print("Connecting to ");
   Serial.print(ssid);
