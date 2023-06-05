@@ -2,10 +2,12 @@
 #include <ESP8266WiFi.h>      // Include the Wi-Fi library
 #include <ESP8266WiFiMulti.h> // Include the Wi-Fi-Multi library
 #include <ESP8266WiFi.h>      // Include the Wi-Fi library
+#include <ESP8266mDNS.h>      // Include the mDNS library
 
 // put function declarations here:
 void startSerialCommunication();
 void establishingWiFiConnection();
+void startMulticastDNS();
 void startAccessPointMode();
 
 void setup()
@@ -13,6 +15,7 @@ void setup()
   // put your setup code here, to run once:
   startSerialCommunication();
   establishingWiFiConnection();
+  startMulticastDNS();
   startAccessPointMode();
 }
 
@@ -27,6 +30,7 @@ void startSerialCommunication()
 {
   Serial.begin(115200); // Start the Serial communication to send messages to the computer
   delay(10);
+
   Serial.println('\n');
 }
 
@@ -53,6 +57,21 @@ void establishingWiFiConnection()
   Serial.println(WiFi.SSID()); // Tell us what network we're connected to
   Serial.print("IP address:\t");
   Serial.println(WiFi.localIP()); // Send the IP address of the ESP8266 to the computer
+
+  Serial.println();
+}
+
+void startMulticastDNS()
+{
+  if (!MDNS.begin("esp8266"))
+  { // Start the mDNS responder for esp8266.local
+    Serial.println("Error setting up MDNS responder!");
+  }
+  Serial.println("mDNS responder started");
+  Serial.print("URL address:\t");
+  Serial.println("esp8266.local"); // Send the URL address of the ESP8266 to the computer
+
+  Serial.println();
 }
 
 void startAccessPointMode()
@@ -67,4 +86,6 @@ void startAccessPointMode()
 
   Serial.print("IP address:\t");
   Serial.println(WiFi.softAPIP()); // Send the IP address of the ESP8266 to the computer
+
+  Serial.println();
 }
