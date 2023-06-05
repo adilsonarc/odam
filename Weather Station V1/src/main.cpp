@@ -1,5 +1,6 @@
 #include <Arduino.h>
-#include <ESP8266WiFi.h> // Include the Wi-Fi library
+#include <ESP8266WiFi.h>      // Include the Wi-Fi library
+#include <ESP8266WiFiMulti.h> // Include the Wi-Fi-Multi library
 
 // put function declarations here:
 void startSerialCommunication();
@@ -28,24 +29,25 @@ void startSerialCommunication()
 
 void establishingWiFiConnection()
 {
-  const char *ssid = "SSID";         // The SSID (name) of the Wi-Fi network you want to connect to
-  const char *password = "PASSWORD"; // The password of the Wi-Fi network
+  ESP8266WiFiMulti wifiMulti; // Create an instance of the ESP8266WiFiMulti class, called 'wifiMulti'
 
-  WiFi.begin(ssid, password); // Connect to the network
-  Serial.print("Connecting to ");
-  Serial.print(ssid);
-  Serial.println(" ...");
+  // Add multipe network
+  // It will connect to the strongest of the networks
+  wifiMulti.addAP("ssid_from_AP_1", "your_password_for_AP_1"); // add Wi-Fi networks you want to connect to
+  wifiMulti.addAP("ssid_from_AP_2", "your_password_for_AP_2");
+  wifiMulti.addAP("ssid_from_AP_3", "your_password_for_AP_3");
 
+  Serial.println("Connecting ...");
   int i = 0;
-  while (WiFi.status() != WL_CONNECTED)
-  { // Wait for the Wi-Fi to connect
+  while (wifiMulti.run() != WL_CONNECTED)
+  { // Wait for the Wi-Fi to connect: scan for Wi-Fi networks, and connect to the strongest of the networks above
     delay(1000);
     Serial.print(++i);
     Serial.print(' ');
   }
-
   Serial.println('\n');
-  Serial.println("Connection established!");
+  Serial.print("Connected to ");
+  Serial.println(WiFi.SSID()); // Tell us what network we're connected to
   Serial.print("IP address:\t");
   Serial.println(WiFi.localIP()); // Send the IP address of the ESP8266 to the computer
 }
