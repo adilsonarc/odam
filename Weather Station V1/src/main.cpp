@@ -19,8 +19,9 @@ void loop()
 
 // put function definitions here:
 
-void startSerialCommunication() {
-  Serial.begin(115200);         // Start the Serial communication to send messages to the computer
+void startSerialCommunication()
+{
+  Serial.begin(115200); // Start the Serial communication to send messages to the computer
   delay(10);
   Serial.println('\n');
 }
