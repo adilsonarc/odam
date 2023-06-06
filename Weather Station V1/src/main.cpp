@@ -6,6 +6,7 @@
 #include <WiFiClient.h>       // Include the WiFiClient library
 #include <ESP8266WebServer.h> // Include the WebServer library
 #include "LittleFS.h"         // Include the WebServer library
+#include "BME280.h"           // Include the BME280 sensor library
 
 // put function declarations here:
 void startSerialCommunication();
@@ -13,12 +14,19 @@ void startFileSystem();
 void establishingWiFiConnection();
 void startMulticastDNS();
 void startAccessPointMode();
+void startSensor();
+float getVoltage();
+float getPressure();
+float getAltiture();
+float getHumidity();
+float getTemperature();
 void startWebServer();
 void handleRoot(); // function prototypes for HTTP handlers
 void handleNotFound();
 void handleGetMetrics();
 
 ESP8266WebServer server(80); // Create a webserver object that listens for HTTP request on port 80
+BME280 bme280;               // BME280 sensor
 
 void setup()
 {
@@ -28,6 +36,7 @@ void setup()
   // establishingWiFiConnection();
   // startMulticastDNS();
   startAccessPointMode();
+  startSensor();
   startWebServer();
 }
 
@@ -117,6 +126,14 @@ void startAccessPointMode()
   Serial.println();
 }
 
+void startSensor()
+{
+  if (!bme280.init())
+  {
+    Serial.println("Device error!");
+  }
+}
+
 void startWebServer()
 {
   server.on("/", handleRoot);                        // Call the 'handleRoot' function when a client requests URI "/"
@@ -168,4 +185,38 @@ void handleGetMetrics()
   clientResponse += "}";
 
   server.send(200, "application/json", clientResponse);
+}
+
+float getVoltage()
+{
+  int reading = analogRead(sensorPin);
+  float voltage = reading * 3.3;
+  voltage /= 1024.0;
+  return voltage;
+}
+
+float getPressure()
+{
+  float pressure = bme280.getPressure();  // pressure in Pa
+  float pressureInHPa = pressure / 100.0; // pressure in hPa
+  return pressureInHPa;
+}
+
+float getAltiture()
+{
+  float pressure = getPressure();
+  float altitude = bme280.calcAltitude(pressure);
+  return altitude;
+}
+
+float getHumidity()
+{
+  float humidity = bme280.getHumidity();
+  return humidity;
+}
+
+float getTemperature()
+{
+  float temperatureC = (voltage - 0.5) * 100;
+  return temperatureC;
 }
