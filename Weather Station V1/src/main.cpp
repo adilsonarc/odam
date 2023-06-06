@@ -16,7 +16,7 @@ void startAccessPointMode();
 void startWebServer();
 void handleRoot(); // function prototypes for HTTP handlers
 void handleNotFound();
-void handleGetData();
+void handleGetMetrics();
 
 ESP8266WebServer server(80); // Create a webserver object that listens for HTTP request on port 80
 
@@ -44,7 +44,7 @@ void startSerialCommunication()
   Serial.begin(115200); // Start the Serial communication to send messages to the computer
   delay(10);
 
-  Serial.println("\nDebug v1");
+  Serial.println("\nDebug v2");
 
   Serial.println('\n');
 }
@@ -67,7 +67,7 @@ void establishingWiFiConnection()
   wifiMulti.addAP("ssid_from_AP_1", "your_password_for_AP_1"); // add Wi-Fi networks you want to connect to
   wifiMulti.addAP("ssid_from_AP_2", "your_password_for_AP_2");
   wifiMulti.addAP("ssid_from_AP_3", "your_password_for_AP_3");
- 
+
   Serial.println("Connecting ...");
   int i = 0;
   while (wifiMulti.run() != WL_CONNECTED)
@@ -87,11 +87,11 @@ void establishingWiFiConnection()
 
 void startMulticastDNS()
 {
-  if (MDNS.begin("esp8266"))
+  if (MDNS.begin("odam"))
   { // Start the mDNS responder for esp8266.local
     Serial.println("mDNS responder started");
     Serial.print("URL address:\t");
-    Serial.println("esp8266.local"); // Send the URL address of the ESP8266 to the computer
+    Serial.println("odam.local"); // Send the URL address of the ESP8266 to the computer
   }
   else
   {
@@ -103,8 +103,8 @@ void startMulticastDNS()
 
 void startAccessPointMode()
 {
-  const char *ssid = "ESP8266 Access Point"; // The name of the Wi-Fi network that will be created
-  const char *password = "987654321";        // The password required to connect to it, leave blank for an open network
+  const char *ssid = "ODAM ESP8266 Access Point"; // The name of the Wi-Fi network that will be created
+  const char *password = "987654321";             // The password required to connect to it, leave blank for an open network
 
   WiFi.softAP(ssid, password); // Start the access point
   Serial.print("Access Point \"");
@@ -119,9 +119,9 @@ void startAccessPointMode()
 
 void startWebServer()
 {
-  server.on("/", handleRoot);                  // Call the 'handleRoot' function when a client requests URI "/"
-  server.onNotFound(handleNotFound);           // When a client requests an unknown URI (i.e. something other than "/"), call function "handleNotFound"
-  server.on("/data", HTTP_GET, handleGetData); // Call the 'handleGetData' function when a GET request is made to URI "/data"
+  server.on("/", handleRoot);                        // Call the 'handleRoot' function when a client requests URI "/"
+  server.onNotFound(handleNotFound);                 // When a client requests an unknown URI (i.e. something other than "/"), call function "handleNotFound"
+  server.on("/metrics", HTTP_GET, handleGetMetrics); // Call the 'handleGetMetrics' function when a GET request is made to URI "/data"
 
   server.begin(); // Actually start the server
   Serial.println("HTTP server started");
@@ -149,7 +149,7 @@ void handleNotFound()
   server.send(404, "text/plain", "404: Not found"); // Send HTTP status 404 (Not Found) when there's no handler for the URI in the request
 }
 
-void handleGetData()
+void handleGetMetrics()
 {
   // Providing a seed value to generate random number
   srand((unsigned)time(NULL));
@@ -161,7 +161,9 @@ void handleGetData()
   clientResponse += rand();
   clientResponse += ",\"pressure\":";
   clientResponse += rand();
-  clientResponse += ",\"altitudex\":";
+  clientResponse += ",\"altitude\":";
+  clientResponse += rand();
+  clientResponse += ",\"battery\":";
   clientResponse += rand();
   clientResponse += "}";
 
