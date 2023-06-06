@@ -5,9 +5,11 @@
 #include <ESP8266mDNS.h>      // Include the mDNS library
 #include <WiFiClient.h>       // Include the WiFiClient library
 #include <ESP8266WebServer.h> // Include the WebServer library
+#include "LittleFS.h"         // Include the WebServer library
 
 // put function declarations here:
 void startSerialCommunication();
+void startFileSystem();
 void establishingWiFiConnection();
 void startMulticastDNS();
 void startAccessPointMode();
@@ -22,8 +24,9 @@ void setup()
 {
   // put your setup code here, to run once:
   startSerialCommunication();
-  establishingWiFiConnection();
-  startMulticastDNS();
+  startFileSystem();
+  // establishingWiFiConnection();
+  // startMulticastDNS();
   startAccessPointMode();
   startWebServer();
 }
@@ -41,7 +44,18 @@ void startSerialCommunication()
   Serial.begin(115200); // Start the Serial communication to send messages to the computer
   delay(10);
 
+  Serial.println("\nDebug v1");
+
   Serial.println('\n');
+}
+
+void startFileSystem()
+{
+  if (!LittleFS.begin())
+  {
+    Serial.println("An Error has occurred while mounting LittleFS");
+    return;
+  }
 }
 
 void establishingWiFiConnection()
@@ -53,8 +67,7 @@ void establishingWiFiConnection()
   wifiMulti.addAP("ssid_from_AP_1", "your_password_for_AP_1"); // add Wi-Fi networks you want to connect to
   wifiMulti.addAP("ssid_from_AP_2", "your_password_for_AP_2");
   wifiMulti.addAP("ssid_from_AP_3", "your_password_for_AP_3");
-  wifiMulti.addAP("Vodafone-6EE702", "g7Sk9VhVvs2WMNbB");
-
+ 
   Serial.println("Connecting ...");
   int i = 0;
   while (wifiMulti.run() != WL_CONNECTED)
@@ -116,7 +129,19 @@ void startWebServer()
 
 void handleRoot()
 {
-  server.send(200, "text/plain", "Hello world!"); // Send HTTP status 200 (Ok) and send some text to the browser/client
+  Serial.println("Request for root page");
+  String contentType = "text/html"; // Get the MIME type
+  String rootPage = "/web-server/index.html";
+  File file = LittleFS.open(rootPage, "r"); // Open the file
+  if (!file)
+  {
+    Serial.println("Failed to open file " + rootPage + " for reading");
+    return;
+  }
+
+  server.streamFile(file, "text/html");
+  file.close(); // Close the file again
+  Serial.println(String("Sent file: ") + rootPage);
 }
 
 void handleNotFound()
@@ -126,8 +151,8 @@ void handleNotFound()
 
 void handleGetData()
 {
-// Providing a seed value to generate random number
-	srand((unsigned) time(NULL));
+  // Providing a seed value to generate random number
+  srand((unsigned)time(NULL));
 
   String clientResponse = "{";
   clientResponse += "\"temperature\":";
