@@ -128,7 +128,7 @@ void startAccessPointMode()
 
 void startSensor()
 {
-  if (!bme280.init())
+  if (!bme280.begin())
   {
     Serial.println("Device error!");
   }
@@ -168,20 +168,17 @@ void handleNotFound()
 
 void handleGetMetrics()
 {
-  // Providing a seed value to generate random number
-  srand((unsigned)time(NULL));
-
   String clientResponse = "{";
   clientResponse += "\"temperature\":";
-  clientResponse += rand();
+  clientResponse += getTemperature();
   clientResponse += ",\"humidity\":";
-  clientResponse += rand();
+  clientResponse += getHumidity();
   clientResponse += ",\"pressure\":";
-  clientResponse += rand();
+  clientResponse += getPressure();
   clientResponse += ",\"altitude\":";
-  clientResponse += rand();
+  clientResponse += getAltiture();
   clientResponse += ",\"battery\":";
-  clientResponse += rand();
+  clientResponse += getVoltage();
   clientResponse += "}";
 
   server.send(200, "application/json", clientResponse);
@@ -189,6 +186,7 @@ void handleGetMetrics()
 
 float getVoltage()
 {
+  int sensorPin = 0;
   int reading = analogRead(sensorPin);
   float voltage = reading * 3.3;
   voltage /= 1024.0;
@@ -197,26 +195,25 @@ float getVoltage()
 
 float getPressure()
 {
-  float pressure = bme280.getPressure();  // pressure in Pa
+  float pressure = bme280.readPressure(); // pressure in Pa
   float pressureInHPa = pressure / 100.0; // pressure in hPa
   return pressureInHPa;
 }
 
 float getAltiture()
 {
-  float pressure = getPressure();
-  float altitude = bme280.calcAltitude(pressure);
+  float altitude = bme280.readAltitude();
   return altitude;
 }
 
 float getHumidity()
 {
-  float humidity = bme280.getHumidity();
+  float humidity = bme280.readHumidity();
   return humidity;
 }
 
 float getTemperature()
 {
-  float temperatureC = (voltage - 0.5) * 100;
+  float temperatureC = (bme280.readTemp() - 0.5) * 100;
   return temperatureC;
 }
